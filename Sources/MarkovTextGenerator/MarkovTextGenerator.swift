@@ -32,10 +32,7 @@ class TextGenerator {
     }
 
     func predictNextToken(from token: [String]) -> String? {
-        guard let nextTokens = transitions[token] else {
-            return nil
-        }
-        return nextTokens.randomElement()
+        return transitions[token]?.randomElement()
     }
 
     func makeSentence() -> String? {
