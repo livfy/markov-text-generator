@@ -1,5 +1,9 @@
 typealias TransitionMatrix = [[String]: [String]]
 
+enum TextGenerationError: Error {
+    case noStartingTokens
+}
+
 class TextGenerator {
     var transitions: TransitionMatrix = [:]
     var startingTokens: [[String]] = []
@@ -35,9 +39,18 @@ class TextGenerator {
         return transitions[token]?.randomElement()
     }
 
-    func makeSentence() -> String? {
+    /// Make a sentence that sounds similar to the text source provided
+    ///
+    /// The generated sentence might be an exisiting sentence
+    /// in the text source if the provided text source is too small
+    ///
+    /// - Parameters:
+    ///
+    /// - Throws: `TextGenerationError.noStartingTokens` if there is no starting tokens
+    /// - Returns: Sentence generated using Markov process
+    func makeSentence() throws(TextGenerationError) -> String? {
         guard var state = startingTokens.randomElement() else {
-            return nil
+            throw .noStartingTokens
         }
 
         var sentence = state.joined(separator: " ")

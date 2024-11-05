@@ -55,7 +55,7 @@ import Testing
     let generator = TextGenerator(withSampleSizeOf: 2)
     generator.buildTransitions(fromSentences: sentences)
 
-    let sentence = generator.makeSentence()
+    let sentence = try generator.makeSentence()
     
     #expect(sentence != nil)
 }
