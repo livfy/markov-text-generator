@@ -1,43 +1,53 @@
-let START = "START"
-
 typealias transitionMatrix = [String: [String]]
 
 class TextGenerator {
     var transitions: transitionMatrix = [:]
+    var startingTokens: [String] = []
 
-    init(fromTextSource textSource: String) {
-        let tokenizedText = textSource.split(separator: "\n").map {
-            $0.split(separator: " ").map {
-                String($0).lowercased()
+    /// Build transitions from sentence usually seperated as words
+    /// Use this to avoid storing whole text source in memeory
+    /// - Parameter sentences: List of sentences:
+    func buildTransitions(fromSentences sentences: [String]) {
+        for sentence in sentences {
+            let tokens = sentence.split(separator: " ").map {
+                $0.lowercased()
             }
-        }
 
-        for sentence in tokenizedText {
-            let markedSentence = [START] + sentence
-            for index in 0..<sentence.count {
-                let state = markedSentence[index]
-                let next = markedSentence[index + 1]
+            for (index, token) in tokens.dropLast().enumerated() {
+                // Collect starting tokens
+                if index == 0 {
+                    startingTokens.append(token)
+                }
 
-                transitions[state, default: []].append(next)
+                let nextToken = tokens[index + 1]
+                transitions[token, default: []].append(nextToken)
             }
         }
     }
 
-    func predictNextWord(fromWord word: String) -> String? {
-        let nextStates = transitions[word]
-        return nextStates?.randomElement()
+    func predictNextToken(from token: String) -> String? {
+        let nextTokens = transitions[token]
+        return nextTokens?.randomElement()
     }
 
     func makeSentence() -> String? {
-        var state = START
+        guard var state = startingTokens.randomElement() else {
+            return nil
+        }
+
         var sentence = ""
 
         while true {
-            guard let nextWord = predictNextWord(fromWord: state) else {
+            guard let nextWord = predictNextToken(from: state) else {
                 return sentence.isEmpty ? nil : sentence
             }
 
-            sentence.append(contentsOf: " " + nextWord)
+            if nextWord == "." {
+                sentence.append(nextWord)
+            } else {
+                sentence.append(contentsOf: " " + nextWord)
+            }
+
             state = nextWord
         }
     }
