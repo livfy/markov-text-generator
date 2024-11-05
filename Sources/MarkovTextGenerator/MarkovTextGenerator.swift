@@ -1,8 +1,13 @@
-typealias transitionMatrix = [String: [String]]
+typealias TransitionMatrix = [[String]: [String]]
 
 class TextGenerator {
-    var transitions: transitionMatrix = [:]
-    var startingTokens: [String] = []
+    var transitions: TransitionMatrix = [:]
+    var startingTokens: [[String]] = []
+    let sampleSize: Int
+
+    init(withSampleSizeOf size: Int = 2) {
+        self.sampleSize = size
+    }
 
     /// Build transitions from sentence usually seperated as words
     /// Use this to avoid storing whole text source in memeory
@@ -13,21 +18,24 @@ class TextGenerator {
                 $0.lowercased()
             }
 
-            for (index, token) in tokens.dropLast().enumerated() {
+            for index in tokens.dropLast(sampleSize).indices {
+                let token = Array(tokens[index..<index + sampleSize])
                 // Collect starting tokens
                 if index == 0 {
                     startingTokens.append(token)
                 }
 
-                let nextToken = tokens[index + 1]
+                let nextToken = tokens[index + sampleSize]
                 transitions[token, default: []].append(nextToken)
             }
         }
     }
 
-    func predictNextToken(from token: String) -> String? {
-        let nextTokens = transitions[token]
-        return nextTokens?.randomElement()
+    func predictNextToken(from token: [String]) -> String? {
+        guard let nextTokens = transitions[token] else {
+            return nil
+        }
+        return nextTokens.randomElement()
     }
 
     func makeSentence() -> String? {
@@ -35,20 +43,12 @@ class TextGenerator {
             return nil
         }
 
-        var sentence = ""
-
-        while true {
-            guard let nextWord = predictNextToken(from: state) else {
-                return sentence.isEmpty ? nil : sentence
-            }
-
-            if nextWord == "." {
-                sentence.append(nextWord)
-            } else {
-                sentence.append(contentsOf: " " + nextWord)
-            }
-
-            state = nextWord
+        var sentence = state.joined(separator: " ")
+        while let nextToken = predictNextToken(from: state) {
+            sentence.append(contentsOf: " " + nextToken)
+            state = state.dropFirst() + [nextToken]
         }
+
+        return sentence
     }
 }
