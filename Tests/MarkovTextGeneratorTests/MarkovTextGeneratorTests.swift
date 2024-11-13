@@ -3,13 +3,16 @@ import Testing
 @testable import MarkovTextGenerator
 
 @Test func buildTransitionsFromSentenceWithSingleSample() async throws {
-    let sentence = [
+    let sentences = [
         "A cat watched patiently",
         "My cat wanted some milk",
     ]
 
     let generator = TextGenerator(withSampleSizeOf: 1)
-    generator.buildTransitions(fromSentences: sentence)
+    for sentence in sentences {
+        generator.buildTransitions(fromSentence: sentence)
+    }
+    
 
     let expectedTransitions = [
         ["a"]: ["cat"],
@@ -27,13 +30,15 @@ import Testing
 }
 
 @Test func buildTransitionsFromSentenceWithMultipleSamples() async throws {
-    let sentence = [
+    let sentences = [
         "A cat watched patiently",
         "My cat wanted some milk",
     ]
 
     let generator = TextGenerator(withSampleSizeOf: 2)
-    generator.buildTransitions(fromSentences: sentence)
+    for sentence in sentences {
+        generator.buildTransitions(fromSentence: sentence)
+    }
 
     let expectedStartingTokens = [["a", "cat"], ["my", "cat"]]
 
@@ -53,7 +58,9 @@ import Testing
     ]
 
     let generator = TextGenerator(withSampleSizeOf: 2)
-    generator.buildTransitions(fromSentences: sentences)
+    for sentence in sentences {
+        generator.buildTransitions(fromSentence: sentence)
+    }
 
     let sentence = try generator.makeSentence()
     
