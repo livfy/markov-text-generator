@@ -1,10 +1,10 @@
 typealias TransitionMatrix = [[String]: [String]]
 
-enum TextGenerationError: Error {
+public enum TextGenerationError: Error {
     case noStartingTokens
 }
 
-class TextGenerator {
+public class TextGenerator {
     var transitions: TransitionMatrix = [:]
     var startingTokens: [[String]] = []
     let sampleSize: Int
@@ -18,7 +18,7 @@ class TextGenerator {
     /// The sentence is segmented on spaces and lowercased
     /// before using to build the transitions.
     /// - Parameter sentence: A sentence.
-    func buildTransitions(fromSentence sentence: String) {
+    public func buildTransitions(fromSentence sentence: String) {
         let tokens = sentence.split(separator: " ").map {
             $0.lowercased()
         }
@@ -49,7 +49,7 @@ class TextGenerator {
     ///
     /// - Throws: `TextGenerationError.noStartingTokens` if there is no starting tokens
     /// - Returns: Sentence generated using Markov process
-    func makeSentence() throws(TextGenerationError) -> String? {
+    public func makeSentence() throws(TextGenerationError) -> String? {
         guard var state = startingTokens.randomElement() else {
             throw .noStartingTokens
         }
